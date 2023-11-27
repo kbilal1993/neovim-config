@@ -4,6 +4,10 @@
 -- By the way have you tried Neovide? Great UI for NeoVim. This config works with and without it.
 -- Usage: Put this in .config/nvim, close and open NeoVim.
 
+-- Config lines. Change these as necessary
+local configpath = "~/.config/nvim/"
+local notespath = "~/Documents/notes/"
+
 -- bootstrap lazy.nvim
 -- If you don't have it installed, this installs it
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
@@ -48,8 +52,8 @@ require("lazy").setup({
 		opts = {}
 	},
 	{
-		-- The theme Ayu
-		"Shatur/neovim-ayu"
+		-- The theme Gruvbox
+		"ellisonleao/gruvbox.nvim"
 	},
 	{
 		-- Quickly toggle a terminal window
@@ -62,15 +66,23 @@ require("lazy").setup({
 		"nvim-lualine/lualine.nvim",
 		dependencies = { 'nvim-tree/nvim-web-devicons' }
 	},
+	{
+		-- Directory manager
+		"stevearc/oil.nvim",
+		dependencies = { 'nvim-tree/nvim-web-devicons' }
+	}
 })
 
 -- setting up theme
-local ayu = require('ayu');
-ayu.colorscheme()
+vim.o.background = "dark"
+vim.cmd([[colorscheme gruvbox]])
 
 -- setting up telescope
 local builtin = require('telescope.builtin')
 vim.keymap.set('n', '<c-p>', builtin.find_files) -- ctrlp = find files
+
+-- setting up oil
+require("oil").setup()
 
 -- setting up which-key
 local wk = require('which-key')
@@ -81,7 +93,7 @@ wk.setup({
 })
 
 -- setting up lualine
-require('lualine').setup { options = { theme = 'ayu'}}
+require('lualine').setup { options = { theme = 'gruvbox'}}
 
 -- setting up LSP server
 local lspconfig = require("lspconfig")
@@ -143,15 +155,25 @@ require('toggleterm').setup {
 -- Extra keybinds
 vim.keymap.set('n', '<space>bl', builtin.buffers)
 vim.keymap.set('n', '<space>bd', ':bd<cr>')
+
 vim.keymap.set('n', '<space>ws', ':sp<cr>')
 vim.keymap.set('n', '<space>wv', ':vs<cr>')
+
 vim.keymap.set('n', '<space>ml', builtin.marks)
-vim.keymap.set('n', '<space>vc', ':edit ~/.config/nvim/init.lua<cr>')
+
+vim.keymap.set('n', '<space>vc', ':edit ' .. configpath .. 'init.lua<cr>')
 vim.keymap.set('n', '<space>vd', ':cd %:h<cr>')
+
 vim.keymap.set('n', '<space>tt', ':ToggleTerm<cr>')
 vim.keymap.set('n', '<space>tb', ':term<cr>')
+
 vim.keymap.set('n', '<space>sF', builtin.live_grep)
 vim.keymap.set('n', '<space>sf', builtin.current_buffer_fuzzy_find)
+
+vim.keymap.set('n', '<space>fo', ":Oil<CR>")
+
+vim.keymap.set('n', '<space>nf', ':Telescope live_grep search_dirs=' .. notespath .. '<cr>')
+vim.keymap.set('n', '<space>no', ':Oil ' .. notespath .. '<cr>')
 
 wk.register({
 	b = {
@@ -182,6 +204,15 @@ wk.register({
 		name = "Search commands",
 		F = "Find text in all files",
 		f = "Find text in this file",
+	},
+	f = {
+		name = "File commands",
+		o = "Open current dir with Oil",
+	},
+	n = {
+		name = "Notes commands",
+		o = "Open notes folder with Oil",
+		f = "Open notes folder with Telescope"
 	}
 }, {prefix = "<space>"})
 
